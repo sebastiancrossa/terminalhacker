@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Hacker : MonoBehaviour
 {
@@ -8,6 +6,8 @@ public class Hacker : MonoBehaviour
     string[] level1Passwords = { "books", "aisle", "self", "font", "borrow" };
     string[] level2Passwords = { "phone", "network", "computer", "tech", "mkbhd" };
     string[] level3Passwords = { "stoicism", "marcus", "plato", "aristotle", "seneca" };
+
+    AudioSource errorSound;
     // --- --- //
 
 
@@ -69,19 +69,17 @@ public class Hacker : MonoBehaviour
 
     void OnUserInput(string input)
     {
-        // Base case - We always want the user to be able to return to the main menu
-        if (currentScreen == Screen.MainMenu || currentScreen == Screen.Password || currentScreen == Screen.Win)
-        {
-            if (input == "menu")
-            {
-                // Reseting up our local variables
-                currentScreen = Screen.MainMenu;
 
-                Terminal.ClearScreen();
-                showHeader();
-                showMainMenu();
-            }
+        if (input == "menu")
+        {
+            // Reseting up our local variables
+            currentScreen = Screen.MainMenu;
+
+            Terminal.ClearScreen();
+            showHeader();
+            showMainMenu();
         }
+
 
         if (currentScreen == Screen.MainMenu)
         {
@@ -93,7 +91,7 @@ public class Hacker : MonoBehaviour
         }
         else if (currentScreen == Screen.Win)
         {
-            Terminal.WriteLine("-= You have CRACKED the CODE =-");
+            Terminal.WriteLine("-= You have already cracked the code. Type \"menu\" to sign out =-");
         }
         else
         {
@@ -108,13 +106,13 @@ public class Hacker : MonoBehaviour
         switch (gameLevel)
         {
             case 1:
-                levelPassword = level1Passwords[3];
+                levelPassword = level1Passwords[Random.Range(0, level1Passwords.Length)];
                 break;
             case 2:
-                levelPassword = level2Passwords[4];
+                levelPassword = level2Passwords[Random.Range(0, level2Passwords.Length)];
                 break;
             case 3:
-                levelPassword = level3Passwords[0];
+                levelPassword = level3Passwords[Random.Range(0, level3Passwords.Length)];
                 break;
             default:
                 Debug.LogError("# Error : Invalid level number");
@@ -123,7 +121,8 @@ public class Hacker : MonoBehaviour
 
 
         Terminal.ClearScreen();
-        Terminal.WriteLine("Enter your password: ");
+        Terminal.WriteLine("Enter your password, hint: " + levelPassword.Anagram());
+        Terminal.WriteLine("Type menu to exit");
     }
 
     void checkPassword(string input)
@@ -132,23 +131,63 @@ public class Hacker : MonoBehaviour
 
         if (levelPassword == input)
         {
-            Terminal.WriteLine("");
-            Terminal.WriteLine("Congratulations! You are in");
-            Terminal.WriteLine("");
-
-            currentScreen = Screen.Win;
+            DisplayWinScreen();
         }
         else
         {
-            Terminal.WriteLine("");
-            Terminal.WriteLine("Sorry, wrong password!");
-            Terminal.WriteLine("");
+            StartGame(); // If the user gets the password wrong, a new hint will appear
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    void DisplayWinScreen()
     {
+        currentScreen = Screen.Win;
 
+        Terminal.ClearScreen();
+
+        Terminal.WriteLine("Congratulations! You are in");
+        ShowLevelReward();
+
+        Terminal.WriteLine("");
+        Terminal.WriteLine("Type menu to exit");
+    }
+
+    void ShowLevelReward()
+    {
+        switch (gameLevel)
+        {
+            case 1:
+
+                Terminal.WriteLine("Have a book");
+                Terminal.WriteLine(@"
+                    ______
+                   /     //
+                  /     //
+                 /____ //
+                (_____(/
+                ");
+                break;
+            case 2:
+                Terminal.WriteLine("Have a computer");
+                Terminal.WriteLine(@"
+                 _
+                |-|  __
+                |=| [Ll]
+                |^| ====
+                ");
+                break;
+            case 3:
+                Terminal.WriteLine("Have a virtue");
+                Terminal.WriteLine(@"
+    \ |____
+   .', ,  ()
+  / -.  _)| 
+ |_(_.    |
+ '-'\  )  |
+                ");
+                break;
+            default:
+                break;
+        }
     }
 }
