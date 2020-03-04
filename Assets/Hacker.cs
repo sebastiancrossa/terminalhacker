@@ -4,12 +4,19 @@ using UnityEngine;
 
 public class Hacker : MonoBehaviour
 {
+    // --- Game config data --- //
+    string[] level1Passwords = { "books", "aisle", "self", "font", "borrow" };
+    string[] level2Passwords = { "phone", "network", "computer", "tech", "mkbhd" };
+    string[] level3Passwords = { "stoicism", "marcus", "plato", "aristotle", "seneca" };
+    // --- --- //
+
+
     // --- Game State --- //
     public int gameLevel;
     public string levelPassword;
 
-    enum Screen { MainMenu, Password, Win };
-    Screen currentScreen = Screen.MainMenu;
+    public enum Screen { MainMenu, Password, Win };
+    public Screen currentScreen = Screen.MainMenu;
     // --- --- //
 
     void showHeader()
@@ -17,11 +24,11 @@ public class Hacker : MonoBehaviour
         Terminal.WriteLine("crossaOS v1.6.6 build 33861");
         Terminal.WriteLine("Initializing terminal ... Done");
         Terminal.WriteLine("user@crossaOS-user/home$");
+        Terminal.WriteLine("");
     }
 
     void showMainMenu()
     {
-        Terminal.ClearScreen();
         Terminal.WriteLine("Choose an option:");
         Terminal.WriteLine("Press 1 for LIBRARY");
         Terminal.WriteLine("Press 2 for TECHNOLOGY");
@@ -34,49 +41,28 @@ public class Hacker : MonoBehaviour
     void Start()
     {
         showHeader();
+        showMainMenu();
     }
 
     void HandleMenuState(string input)
     {
-        switch (input)
+        bool isValidLevel = (input == "1" || input == "2" || input == "3");
+
+        if (isValidLevel)
         {
-            case "hack":
-                showMainMenu();
-                break;
-            case "1":
-                gameLevel = 1;
-                levelPassword = "book";
+            gameLevel = int.Parse(input);
 
-                currentScreen = Screen.Password;
-                StartGame();
+            StartGame();
+        }
+        else
+        {
+            Terminal.WriteLine("");
+            Terminal.WriteLine("----------------------------");
+            Terminal.WriteLine("Please choose a valid level");
+            Terminal.WriteLine("----------------------------");
+            Terminal.WriteLine("");
 
-                break;
-            case "2":
-                gameLevel = 2;
-                levelPassword = "phone";
-
-                currentScreen = Screen.Password;
-                StartGame();
-
-                break;
-            case "3":
-                gameLevel = 3;
-                levelPassword = "stoicism";
-
-                currentScreen = Screen.Password;
-                StartGame();
-
-                break;
-            default:
-                Terminal.WriteLine("");
-                Terminal.WriteLine("----------------------------");
-                Terminal.WriteLine("Please choose a valid level");
-                Terminal.WriteLine("----------------------------");
-                Terminal.WriteLine("");
-
-                Terminal.WriteLine("user@crossaOS-user/home$");
-
-                break;
+            showMainMenu();
         }
     }
 
@@ -86,12 +72,13 @@ public class Hacker : MonoBehaviour
         // Base case - We always want the user to be able to return to the main menu
         if (currentScreen == Screen.MainMenu || currentScreen == Screen.Password || currentScreen == Screen.Win)
         {
-            if (input == "hack")
+            if (input == "menu")
             {
                 // Reseting up our local variables
-                gameLevel = 0;
                 currentScreen = Screen.MainMenu;
 
+                Terminal.ClearScreen();
+                showHeader();
                 showMainMenu();
             }
         }
@@ -106,7 +93,7 @@ public class Hacker : MonoBehaviour
         }
         else if (currentScreen == Screen.Win)
         {
-            Terminal.WriteLine("Win!");
+            Terminal.WriteLine("-= You have CRACKED the CODE =-");
         }
         else
         {
@@ -116,18 +103,40 @@ public class Hacker : MonoBehaviour
 
     void StartGame()
     {
+        currentScreen = Screen.Password;
+
+        switch (gameLevel)
+        {
+            case 1:
+                levelPassword = level1Passwords[3];
+                break;
+            case 2:
+                levelPassword = level2Passwords[4];
+                break;
+            case 3:
+                levelPassword = level3Passwords[0];
+                break;
+            default:
+                Debug.LogError("# Error : Invalid level number");
+                break;
+        }
+
+
         Terminal.ClearScreen();
-        Terminal.WriteLine("You have chosen level " + gameLevel);
         Terminal.WriteLine("Enter your password: ");
     }
 
     void checkPassword(string input)
     {
+        string convertedInput = input.ToLower();
+
         if (levelPassword == input)
         {
             Terminal.WriteLine("");
             Terminal.WriteLine("Congratulations! You are in");
             Terminal.WriteLine("");
+
+            currentScreen = Screen.Win;
         }
         else
         {
