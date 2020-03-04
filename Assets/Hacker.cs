@@ -6,6 +6,7 @@ public class Hacker : MonoBehaviour
 {
     // --- Game State --- //
     public int gameLevel;
+    public string levelPassword;
 
     enum Screen { MainMenu, Password, Win };
     Screen currentScreen = Screen.MainMenu;
@@ -44,6 +45,7 @@ public class Hacker : MonoBehaviour
                 break;
             case "1":
                 gameLevel = 1;
+                levelPassword = "book";
 
                 currentScreen = Screen.Password;
                 StartGame();
@@ -51,6 +53,7 @@ public class Hacker : MonoBehaviour
                 break;
             case "2":
                 gameLevel = 2;
+                levelPassword = "phone";
 
                 currentScreen = Screen.Password;
                 StartGame();
@@ -58,6 +61,7 @@ public class Hacker : MonoBehaviour
                 break;
             case "3":
                 gameLevel = 3;
+                levelPassword = "stoicism";
 
                 currentScreen = Screen.Password;
                 StartGame();
@@ -76,15 +80,6 @@ public class Hacker : MonoBehaviour
         }
     }
 
-    void HandlePasswordState(string input)
-    {
-        Terminal.WriteLine(input);
-    }
-
-    void HandleWinState()
-    {
-        Terminal.WriteLine("You win!");
-    }
 
     void OnUserInput(string input)
     {
@@ -107,11 +102,11 @@ public class Hacker : MonoBehaviour
         }
         else if (currentScreen == Screen.Password)
         {
-            HandlePasswordState(input);
+            checkPassword(input);
         }
         else if (currentScreen == Screen.Win)
         {
-            HandleWinState();
+            Terminal.WriteLine("Win!");
         }
         else
         {
@@ -123,6 +118,23 @@ public class Hacker : MonoBehaviour
     {
         Terminal.ClearScreen();
         Terminal.WriteLine("You have chosen level " + gameLevel);
+        Terminal.WriteLine("Enter your password: ");
+    }
+
+    void checkPassword(string input)
+    {
+        if (levelPassword == input)
+        {
+            Terminal.WriteLine("");
+            Terminal.WriteLine("Congratulations! You are in");
+            Terminal.WriteLine("");
+        }
+        else
+        {
+            Terminal.WriteLine("");
+            Terminal.WriteLine("Sorry, wrong password!");
+            Terminal.WriteLine("");
+        }
     }
 
     // Update is called once per frame
